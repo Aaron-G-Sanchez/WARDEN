@@ -1,0 +1,23 @@
+[ ] Allow user to add discord webhook endpoint
+[ ] Allow user to configure designated logs
+  - SSH attempts (sucessful and denied)
+  - User joins MC server
+
+1) Get config info to build config object
+
+
+
+//********** TEST CODE **********//
+
+// Runs the journactl command using the systemd unit flag.
+cmd := exec.Command("journalctl", "-u", "ssh")
+
+var out strings.Builder
+cmd.Stdout = &out
+
+err := cmd.Run()
+if err != nil {
+  log.Fatal(err)
+}
+
+fmt.Printf("%v", out.String())
