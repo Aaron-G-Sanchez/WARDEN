@@ -2,6 +2,7 @@ package main
 
 import (
 	"cycle/warden/internal/config"
+	"cycle/warden/internal/journal"
 	"fmt"
 	"log"
 )
@@ -13,4 +14,7 @@ func main() {
 	}
 
 	fmt.Printf("%+v\n", *config)
+
+	// JOURNAL LOGGING TEST
+	journal.Watch()
 }
