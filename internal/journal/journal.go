@@ -20,17 +20,22 @@ func Watch() {
 	}
 	defer cmd.Process.Kill()
 
-	fmt.Printf("Starting realtime logger")
+	// TODO: Remove after testing.
+	fmt.Printf("Starting realtime logger \n")
+	lineNum := 0
 
 	scanner := bufio.NewScanner(stdout)
+
 	for scanner.Scan() {
 		line := scanner.Bytes()
 		if len(line) == 0 {
 			continue
 		}
 
-		fmt.Println("LINE:::", string(line))
+		// TODO: Evaluate line.
+		fmt.Printf("LINE::%v:: %v\n", lineNum, string(line))
 
+		lineNum++
 		if err := scanner.Err(); err != nil {
 			log.Printf("Error reading stream: %v", err)
 		}
