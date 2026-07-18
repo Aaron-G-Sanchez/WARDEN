@@ -1,44 +1,46 @@
 package journal
 
 import (
-	"bufio"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os/exec"
 )
 
+type Log struct {
+	Timestamp       string `json:"__REALTIME_TIMESTAMP"`
+	SystemdUnit     string `json:"_SYSTEMD_UNIT"`
+	Message         string `json:"MESSAGE"`
+	SyslogTimestamp string `json:"SYSLOG_TIMESTAMP"`
+}
+
 func Watch() {
-	cmd := exec.Command("journalctl", "-t", "sshd-session", "-f")
+	cmd := exec.Command("journalctl", "-t", "sshd-session", "-o", "json", "-f")
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		log.Fatalf("Failed to create stdout pipe: %v", err)
 	}
 
+	fmt.Printf("Starting logger \n")
+
 	if err := cmd.Start(); err != nil {
 		log.Fatalf("Failed to start journalctl command: %v", err)
 	}
 	defer cmd.Process.Kill()
 
-	// TODO: Remove after testing.
-	fmt.Printf("Starting realtime logger \n")
-	lineNum := 0
+	decoder := json.NewDecoder(stdout)
 
-	scanner := bufio.NewScanner(stdout)
+	for decoder.More() {
 
-	for scanner.Scan() {
-		line := scanner.Bytes()
-		if len(line) == 0 {
-			continue
+		var logEntry *Log
+
+		if err := decoder.Decode(&logEntry); err != nil {
+			log.Printf("Failed to decode log entry: %v\n", err)
 		}
 
-		// TODO: Evaluate line.
-		fmt.Printf("LINE::%v:: %v\n", lineNum, string(line))
+		fmt.Printf("%+v \n", *logEntry)
 
-		lineNum++
-		if err := scanner.Err(); err != nil {
-			log.Printf("Error reading stream: %v", err)
-		}
 	}
 
 	cmd.Wait()
