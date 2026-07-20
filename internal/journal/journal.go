@@ -3,8 +3,8 @@ package journal
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
-	"os/exec"
 )
 
 type Log struct {
@@ -14,23 +14,8 @@ type Log struct {
 	SyslogTimestamp string `json:"SYSLOG_TIMESTAMP"`
 }
 
-func Watch() {
-	cmd := exec.Command("journalctl", "-t", "sshd-session", "-o", "json", "-f")
-
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		log.Fatalf("Failed to create stdout pipe: %v", err)
-	}
-
-	fmt.Printf("Starting logger \n")
-
-	if err := cmd.Start(); err != nil {
-		log.Fatalf("Failed to start journalctl command: %v", err)
-	}
-	defer cmd.Process.Kill()
-
-	decoder := json.NewDecoder(stdout)
-
+func Watch(reader io.Reader) {
+	decoder := json.NewDecoder(reader)
 	for decoder.More() {
 
 		var logEntry *Log
@@ -39,9 +24,17 @@ func Watch() {
 			log.Printf("Failed to decode log entry: %v\n", err)
 		}
 
+		// TODO: Evaluate line.
+		// 1) Filter logs for any log before command was ran.
+		// 2) Call the notifier when specific connection requests are initiated.
 		fmt.Printf("%+v \n", *logEntry)
 
 	}
 
-	cmd.Wait()
+}
+
+func evaluate(logEntry *Log) {
+	// 1) Skip entries older than the program start time
+	// 2) Evalutate the logEntry.Message for connection patterns
+	// 		and call the notifier if matched.
 }
