@@ -2,7 +2,6 @@ package journal
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 )
@@ -14,6 +13,7 @@ type Log struct {
 	SyslogTimestamp string `json:"SYSLOG_TIMESTAMP"`
 }
 
+// TODO: Write unit test.
 func Watch(reader io.Reader) {
 	decoder := json.NewDecoder(reader)
 	for decoder.More() {
@@ -27,7 +27,7 @@ func Watch(reader io.Reader) {
 		// TODO: Evaluate line.
 		// 1) Filter logs for any log before command was ran.
 		// 2) Call the notifier when specific connection requests are initiated.
-		fmt.Printf("%+v \n", *logEntry)
+		log.Printf("%+v\n", *logEntry)
 
 	}
 
