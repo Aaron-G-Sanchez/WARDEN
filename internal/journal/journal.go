@@ -28,9 +28,7 @@ func Watch(reader io.Reader) {
 		// 1) Filter logs for any log before command was ran.
 		// 2) Call the notifier when specific connection requests are initiated.
 		log.Printf("%+v\n", *logEntry)
-
 	}
-
 }
 
 func evaluate(logEntry *Log) {
